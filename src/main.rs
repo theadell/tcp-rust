@@ -11,13 +11,20 @@ fn main() -> io::Result<()> {
             // Not IPV4 packet
             continue;
         }
-        eprintln!(
-            "read {} bytes (flags: {:x}, proto: {:x}): {:x?}",
-            nbytes - 4,
-            flags,
-            proto,
-            &buf[4..nbytes]
-        );
+        match etherparse::Ipv4HeaderSlice::from_slice(&buf[4..nbytes]) {
+            Ok(p) => {
+                eprintln!(
+                    "read {} bytes (flags: {:x}, proto: {:x}): {:?}",
+                    nbytes - 4,
+                    flags,
+                    proto,
+                    p
+                );
+            }
+            Err(e) => {
+                eprint!("Ignoring package {:?}", e);
+            }
+        }
     }
     // some comment added
     // Ok(())
